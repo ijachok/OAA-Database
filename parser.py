@@ -256,7 +256,10 @@ class Interpreter(object):
                     if self.current_token.text.upper()=="DESC":
                         sort="DESC"
                         self.next_token()
-                    elif self.current_token.text.upper()!="ASC":
+                    elif self.current_token.text.upper()=="ASC":
+                        sort="ASC"
+                        self.next_token()
+                    else:
                         sys.stderr.write('Error: Unknown keyword '+self.current_token.text.upper()+', expected ASC or DESC.\n')
                         return
                 order_by.append((column, sort))
@@ -268,7 +271,7 @@ class Interpreter(object):
                 else:
                     sys.stderr.write('Error: Unexpected argument '+self.current_token.text+'\n')
                     return
-        database.print_pretty_table(database.database[tablename]['columns'], database.select_from_table(database.database[tablename], condition, order_by))
+        database.print_table(database.database[tablename]['columns'], database.select_from_table(database.database[tablename], condition, order_by))
         return
 
     def interpret(self):
