@@ -3,7 +3,7 @@ import re #regex
 import database
 
 whitespaces = [' ', '\t', '\r', '\n', '\0']
-specialchar = ['(', ')', ',', ';']
+specialchar = ['(', ')', ',', ';', '>', '<', '=']
 
 class Token(object):
     def __init__(self, type, text):
@@ -211,8 +211,64 @@ class Interpreter(object):
             return
 
     def interpret_select(self):
-        
-        print("AAA")
+        self.next_token()
+        condition=None
+        order_by=None
+        if self.current_token.type!="keyword" or self.current_token.text.upper()!="FROM":
+            sys.stderr.write('Error: do not put anything between SELECT and FROM, this command only supports selecting all columns.\n')
+            return
+        self.next_token()
+        if self.current_token.type!="keyword":
+            sys.stderr.write('Error: expected the table name after FROM.\n')
+            return
+        tablename=self.current_token.text
+        self.next_token()
+        if self.current_token.type=="keyword" and self.current_token.text.upper()=="WHERE":
+            condition=[]
+            self.next_token()
+            if self.current_token.type!="keyword":
+                sys.stderr.write('Error: expected the column name after WHERE.\n')
+                return
+            condition.append(self.current_token.text)
+            self.next_token()
+            if self.current_token.type!="sign":
+                sys.stderr.write('Error: the sign after the column name in WHERE.\n')
+                return
+            if self.current_token.text!=">":
+                sys.stderr.write('Error: only the ">" operator is supported.\n')
+                return
+            else:
+                condition.append(">")
+            self.next_token()
+            condition.append(self.current_token.text)
+            self.next_token()
+        if self.current_token.type=="keyword" and self.current_token.text.upper()=="ORDER_BY":
+            order_by=[]
+            self.next_token()
+            while True:
+                sort="ASC"
+                if self.current_token.type!="keyword":
+                    sys.stderr.write('Error: expected a comma-separated list of columns after ORDER BY.\n')
+                    return
+                column=self.current_token.text
+                self.next_token()
+                if self.current_token.type=="keyword":
+                    if self.current_token.text.upper()=="DESC":
+                        sort="DESC"
+                        self.next_token()
+                    elif self.current_token.text.upper()!="ASC":
+                        sys.stderr.write('Error: Unknown keyword '+self.current_token.text.upper()+', expected ASC or DESC.\n')
+                        return
+                order_by.append((column, sort))
+                if self.current_token.type=="comma":
+                    self.next_token()
+                    continue
+                if self.current_token.type=="end":
+                    break
+                else:
+                    sys.stderr.write('Error: Unexpected argument '+self.current_token.text+'\n')
+                    return
+        database.print_pretty_table(database.database[tablename]['columns'], database.select_from_table(database.database[tablename], condition, order_by))
         return
 
     def interpret(self):
