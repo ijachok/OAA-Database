@@ -42,7 +42,7 @@ def insert_into_table(table_name, values):
             table['index'][column][value] = []
         table['index'][column][value].append(row)
     
-    # print(f"Row inserted into '{table_name}': {row}")
+    print(f"Row inserted into '{table_name}': {row}")
 
 def print_table(columns, table):
     # table: list of dicts with col-val pairs where each dict is a row
