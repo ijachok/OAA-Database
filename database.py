@@ -17,7 +17,7 @@ def create_table(table_name, columns):
 
 def insert_into_table(table_name, values):
     
-    # values: dict of column-value pairs
+    # values: list of column values
     
     if table_name not in database:
         print(f"Table '{table_name}' does not exist.")
@@ -25,13 +25,15 @@ def insert_into_table(table_name, values):
     
     table = database[table_name]
     columns = table['columns']
+
+    if len(values) < len(columns):
+        print(f"Values for {len(columns) - len(values)} columns are missing")
+        return
+    elif len(values) > len(columns):
+        print(f"Extra {len(values) - len(columns)} values are present")
+        return
     
-    for column in columns:
-        if column not in values:
-            print(f"Missing value for column '{column}'.")
-            return
-    
-    row = {column: values[column] for column in columns}
+    row = {columns[i]: values[i] for i in range(len(columns))}
     table['data'].append(row)
     
     # Update the index
@@ -71,16 +73,17 @@ def print_pretty_table(table):
 create_table("employees", ["id", "name", "position", "salary", "department"])
 
 # Populate the 'employees' table with 10 entries
-insert_into_table("employees", {"id": 1, "name": "Alice", "position": "Manager", "salary": 75000, "department": "HR"})
-insert_into_table("employees", {"id": 2, "name": "Bob", "position": "Developer", "salary": 85000, "department": "IT"})
-insert_into_table("employees", {"id": 3, "name": "Charlie", "position": "Analyst", "salary": 65000, "department": "Finance"})
-insert_into_table("employees", {"id": 4, "name": "Diana", "position": "Developer", "salary": 90000, "department": "IT"})
-insert_into_table("employees", {"id": 5, "name": "Eve", "position": "Intern", "salary": 30000, "department": "Marketing"})
-insert_into_table("employees", {"id": 6, "name": "Frank", "position": "Designer", "salary": 70000, "department": "Creative"})
-insert_into_table("employees", {"id": 7, "name": "Grace", "position": "Manager", "salary": 80000, "department": "Sales"})
-insert_into_table("employees", {"id": 8, "name": "Hank", "position": "Support", "salary": 45000, "department": "Customer Service"})
-insert_into_table("employees", {"id": 9, "name": "Ivy", "position": "HR Specialist", "salary": 55000, "department": "HR"})
-insert_into_table("employees", {"id": 10, "name": "Jack", "position": "Technician", "salary": 60000, "department": "Maintenance"})
+insert_into_table("employees", [1, "Alice", "Manager", 75000, "HR"])
+insert_into_table("employees", [1, "Alice", "Manager", 75000, "HR", 1111])
+insert_into_table("employees", [2, "Bob", "Developer", 85000, "IT"])
+insert_into_table("employees", [3, "Charlie", "Analyst", 65000, "Finance"])
+insert_into_table("employees", [4, "Diana", "Developer", 90000, "IT"])
+insert_into_table("employees", [5, "Eve", "Intern", 30000, "Marketing"])
+insert_into_table("employees", [6, "Frank", "Designer", 70000, "Creative"])
+insert_into_table("employees", [7, "Grace", "Manager", 80000, "Sales"])
+insert_into_table("employees", [8, "Hank", "Support", 45000, "Customer Service"])
+insert_into_table("employees", [9, "Ivy", "HR Specialist", 55000, "HR"])
+insert_into_table("employees", [10, "Jack", "Technician", 60000, "Maintenance"])
 
 # Print the 'employees' table data to verify
 print('table:')
