@@ -42,7 +42,7 @@ def insert_into_table(table_name, values):
             table['index'][column][value] = []
         table['index'][column][value].append(row)
     
-    # print(f"Row inserted into '{table_name}': {row}")
+    print(f"Row inserted into '{table_name}': {row}")
 
 def print_table(columns, table):
     # table: list of dicts with col-val pairs where each dict is a row
@@ -110,26 +110,28 @@ def select_from_table(table, condition=None, order_by=None):
 
 # Example usage
 
-# Create a table named 'employees'
-print('CREATE employees (id, name, position, salary, department)')
-create_table("employees", ["id", "name", "position", "salary", "department"])
-print_pretty_table(database['employees']['columns'], database['employees']['data'])
-print_table(database['employees']['columns'], database['employees']['data'])
-# Populate the 'employees' table with 10 entries
-insert_into_table("employees", [1, "Alice", "Manager", 75000, "HR"])
-insert_into_table("employees", [1, "Alice", "Manager", 75000, "HR", 1111])
-insert_into_table("employees", [2, "Bob", "Developer", 85000, "IT"])
-insert_into_table("employees", [3, "Charlie", "Analyst", 65000, "Finance"])
-insert_into_table("employees", [4, "Diana", "Developer", 90000, "IT"])
-insert_into_table("employees", [5, "Eve", "Intern", 30000, "Marketing"])
-insert_into_table("employees", [6, "Frank", "Designer", 70000, "Creative"])
-insert_into_table("employees", [7, "Grace", "Manager", 80000, "Sales"])
-insert_into_table("employees", [8, "Hank", "Support", 45000, "Customer Service"])
-insert_into_table("employees", [9, "Ivy", "HR Specialist", 55000, "HR"])
-insert_into_table("employees", [10, "Jack", "Technician", 60000, "Maintenance"])
-insert_into_table("employees", [11, "Grace", "Manager", 80000, "Sales"])
+if __name__ == "__main__":
 
-print('table:')
-print_pretty_table(database['employees']['columns'], select_from_table(database['employees']))
+    # Create a table named 'employees'
+    print('CREATE employees (id, name, position, salary, department)')
+    create_table("employees", ["id", "name", "position", "salary", "department"])
+    print_pretty_table(database['employees']['columns'], database['employees']['data'])
+    print_table(database['employees']['columns'], database['employees']['data'])
+    # Populate the 'employees' table with 10 entries
+    insert_into_table("employees", [1, "Alice", "Manager", 75000, "HR"])
+    insert_into_table("employees", [1, "Alice", "Manager", 75000, "HR", 1111])
+    insert_into_table("employees", [2, "Bob", "Developer", 85000, "IT"])
+    insert_into_table("employees", [3, "Charlie", "Analyst", 65000, "Finance"])
+    insert_into_table("employees", [4, "Diana", "Developer", 90000, "IT"])
+    insert_into_table("employees", [5, "Eve", "Intern", 30000, "Marketing"])
+    insert_into_table("employees", [6, "Frank", "Designer", 70000, "Creative"])
+    insert_into_table("employees", [7, "Grace", "Manager", 80000, "Sales"])
+    insert_into_table("employees", [8, "Hank", "Support", 45000, "Customer Service"])
+    insert_into_table("employees", [9, "Ivy", "HR Specialist", 55000, "HR"])
+    insert_into_table("employees", [10, "Jack", "Technician", 60000, "Maintenance"])
+    insert_into_table("employees", [11, "Grace", "Manager", 80000, "Sales"])
 
-print_pretty_table(database['employees']['columns'], select_from_table(database['employees'], condition=("name", ">", "salary"), order_by=[("name", "ASC"), ("id", "DESC")]))
+    print('table:')
+    print_pretty_table(database['employees']['columns'], select_from_table(database['employees']))
+
+    print_pretty_table(database['employees']['columns'], select_from_table(database['employees'], condition=("name", ">", "salary"), order_by=[("name", "ASC"), ("id", "DESC")]))
