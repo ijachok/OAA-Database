@@ -44,10 +44,8 @@ def insert_into_table(table_name, values):
     
     # print(f"Row inserted into '{table_name}': {row}")
 
-def print_table(table):
+def print_table(columns, table):
     # table: list of dicts with col-val pairs where each dict is a row
-
-    columns = list(table[0].keys())
 
     print('+' + ("=" * 16 + '+') * len(columns))
     print('║' + ' ║'.join( col_name.ljust(15) for col_name in columns) + ' ║')
@@ -57,21 +55,66 @@ def print_table(table):
         print('+' + ("-" * 16 + '+') * len(columns))
 
 
-def print_pretty_table(table):
+def print_pretty_table(columns, table):
+    # table: list of dicts with col-val pairs where each dict is a row
     prettytable = PrettyTable()
-    prettytable.field_names = list(table[0].keys())
+    prettytable.field_names = columns
 
     for row in table:
         prettytable.add_row(list(row.values()))
 
     print(prettytable)
+
+def select_from_table(table, condition=None, order_by=None):
+    
+    # :param condition: A tuple  
+    # example: ("name", ">", "Murzik") or ("age", ">", "salary").
+
+    # :param order_by: A list of tuples
+    # example: [("name", "ASC"), ("id", "DESC")].
+    
+    # :return: list of dicts with col-val pairs where each dict is a row
+
+    selected_table = table["data"]
+    columns = table["columns"]
+
+    # Filter rows based on WHERE condition
+    if condition:
+        column1, operator, value_or_column2 = condition
+        if column1 not in columns:
+            print(f"Error: Column '{column1}' does not exist.")
+            return
+
+        def condition_filter(row):
+            left_value = row[column1]
+            # Right value can be another column or a literal
+            right_value = row[value_or_column2] if value_or_column2 in columns else value_or_column2
+
+            if operator == ">":
+                return str(left_value) >= str(right_value)
+            return False
+
+        selected_table = [row for row in selected_table if condition_filter(row)]
+
+    # Sort rows based on ORDER_BY clause
+    if order_by:
+        for column_name, order in reversed(order_by):  # Reverse to prioritize first columns
+            if column_name not in columns:
+                print(f"Error: Column '{column_name}' does not exist.")
+                return
+            selected_table.sort(key=lambda x: x[column_name], reverse=(order.upper() == "DESC"))
+
+    # Print the result in table format
+    return selected_table
     
 
 # Example usage
 
 # Create a table named 'employees'
+print('CREATE employees (id, name, position, salary, department)')
 create_table("employees", ["id", "name", "position", "salary", "department"])
-
+print_pretty_table(database['employees']['columns'], database['employees']['data'])
+print_table(database['employees']['columns'], database['employees']['data'])
 # Populate the 'employees' table with 10 entries
 insert_into_table("employees", [1, "Alice", "Manager", 75000, "HR"])
 insert_into_table("employees", [1, "Alice", "Manager", 75000, "HR", 1111])
@@ -84,11 +127,9 @@ insert_into_table("employees", [7, "Grace", "Manager", 80000, "Sales"])
 insert_into_table("employees", [8, "Hank", "Support", 45000, "Customer Service"])
 insert_into_table("employees", [9, "Ivy", "HR Specialist", 55000, "HR"])
 insert_into_table("employees", [10, "Jack", "Technician", 60000, "Maintenance"])
+insert_into_table("employees", [11, "Grace", "Manager", 80000, "Sales"])
 
-# Print the 'employees' table data to verify
 print('table:')
-print_table(database['employees']['data'])
-print('Alices')
-print_pretty_table(database['employees']['index']['name']['Alice'])
-print('managers')
-print_table(database['employees']['index']['position']['Manager'])
+print_pretty_table(database['employees']['columns'], select_from_table(database['employees']))
+
+print_pretty_table(database['employees']['columns'], select_from_table(database['employees'], condition=("name", ">", "salary"), order_by=[("name", "ASC"), ("id", "DESC")]))
