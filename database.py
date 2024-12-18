@@ -65,13 +65,15 @@ def print_pretty_table(columns, table):
 
     print(prettytable)
 
-def select_from_table(table, condition=None, order_by=None):
+def select_from_table(table, condition=None, order_by=None, column=True):
     
     # :param condition: A tuple  
     # example: ("name", ">", "Murzik") or ("age", ">", "salary").
 
     # :param order_by: A list of tuples
     # example: [("name", "ASC"), ("id", "DESC")].
+    
+    # :param column: Whether we should compare against a column (True) or a value (False)
     
     # :return: list of dicts with col-val pairs where each dict is a row
 
@@ -88,10 +90,10 @@ def select_from_table(table, condition=None, order_by=None):
         def condition_filter(row):
             left_value = row[column1]
             # Right value can be another column or a literal
-            right_value = row[value_or_column2] if value_or_column2 in columns else value_or_column2
+            right_value = row[value_or_column2] if column else value_or_column2
 
             if operator == ">":
-                return str(left_value) >= str(right_value)
+                return str(left_value) > str(right_value)
             return False
 
         selected_table = [row for row in selected_table if condition_filter(row)]

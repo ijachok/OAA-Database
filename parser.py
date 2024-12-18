@@ -214,6 +214,7 @@ class Interpreter(object):
         self.next_token()
         condition=None
         order_by=None
+        column=True
         if self.current_token.type!="keyword" or self.current_token.text.upper()!="FROM":
             sys.stderr.write('Error: do not put anything between SELECT and FROM, this command only supports selecting all columns.\n')
             return
@@ -240,6 +241,13 @@ class Interpreter(object):
             else:
                 condition.append(">")
             self.next_token()
+            if self.current_token.type=="keyword":
+                column=True
+            elif self.current_token.type=="string":
+                column=False
+            else:
+                sys.stderr.write('Error: expected a value or a column name after the comparison operator.\n')
+                return
             condition.append(self.current_token.text)
             self.next_token()
         if self.current_token.type=="keyword" and self.current_token.text.upper()=="ORDER_BY":
@@ -271,7 +279,7 @@ class Interpreter(object):
                 else:
                     sys.stderr.write('Error: Unexpected argument '+self.current_token.text+'\n')
                     return
-        database.print_table(database.database[tablename]['columns'], database.select_from_table(database.database[tablename], condition, order_by))
+        database.print_table(database.database[tablename]['columns'], database.select_from_table(database.database[tablename], condition, order_by, column))
         return
 
     def interpret(self):
