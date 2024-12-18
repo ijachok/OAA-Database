@@ -50,7 +50,7 @@ class Lexer(object):
             self.advance()
             while self.current_char!='"':
                 if self.current_char=="\n":
-                    sys.stderr.write('ERROR at '+text[-10]+': a string must be written on a single line\n')
+                    sys.stderr.write('ERROR at '+text[-10:]+': a string must be written on a single line\n')
                     return Token("error", "string break")
                 else:
                     text+=self.current_char
